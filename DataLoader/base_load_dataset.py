@@ -79,8 +79,8 @@ class BaseLoadDataset():
     for x in base_self.__label_map:
       y = base_self.__label_map[x]
       if y not in base_self.__real_cnt:
-        base_self.__print('label map ' + x)
-        base_self.__print('real_cnt ' + y)
+        base_self.__print(f"label map  {x}")
+        base_self.__print(f"real_cnt  {y}")
         base_self.__real_cnt[y] = 0
         base_self.__real_cnt[y] += base_self.__real_cnt[x]
         base_self.__real_cnt.pop(x)
@@ -106,7 +106,7 @@ class BaseLoadDataset():
     df_ans = pd.DataFrame()
     for root, _, files in os.walk(dir_path):
         for file in files:
-            base_self.__print("Begin file " + file)
+            base_self.__print(f"Begin file {file}")
             if not file.endswith(".csv"):
                 continue
             list_ss = []
@@ -146,8 +146,8 @@ class BaseLoadDataset():
             df_ans = CustomMerger().fit_transform([df_ans] + list_ss)
         
             base_self.__print("Update label:")
-            base_self.__print(base_self.__label_cnt)
-            base_self.__print("Time load:" + time.time() + time_file)
+            base_self.__print(f"{base_self.__label_cnt}")
+            base_self.__print(f"Time load: {time.time()} {time_file}")
             base_self.__print(f"========================== Finish {file} =================================")
 
     
