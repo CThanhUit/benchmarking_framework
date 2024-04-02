@@ -2,7 +2,7 @@
 ds_name: "CICDDoS2019"
 ds_size: None
 ds_paper_link: "http://clouds.iec-uit.com/iec-iot-2021.idsdatasets/CICDDoS2019.zip"
-ds_link: None
+ds_link: "https://drive.google.com/uc?export=download&id=1kxYjcNm7Q8QOn2Ou5MzVwOl-gzqRyHln"
 csv_link: None
 fts_names: [
     "Unnamed: 0", "Flow ID", " Source IP", " Source Port",
