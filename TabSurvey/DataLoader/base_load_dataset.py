@@ -34,7 +34,7 @@ class BaseLoadDataset():
     base_self.__label_cnt = { } # Actual number of samples loaded by function
     base_self.__error_cnt = 0
     base_self.__set_config(dataset_name)
-    base_self.__print()
+    base_self.Show_basic_metadata()
     base_self.__fixLabel()
 
 
@@ -66,9 +66,9 @@ class BaseLoadDataset():
       except KeyError as e:
         print(f"KeyError: {e} in {config_setting_path}")
 
-  def __print(base_self) -> None:
+  def __print(base_self, str) -> None:
     if base_self.__PRINT_ABLE:
-        base_self.Show_basic_metadata()
+        print(str)
 
   def __add_mode_features(base_self, dataset, FLAG_GENERATING: bool = False) -> pd.DataFrame:
     pass
@@ -79,8 +79,8 @@ class BaseLoadDataset():
     for x in base_self.__label_map:
       y = base_self.__label_map[x]
       if y not in base_self.__real_cnt:
-        print('label map ' + x)
-        print('real_cnt ' + y)
+        base_self.__print('label map ' + x)
+        base_self.__print('real_cnt ' + y)
         base_self.__real_cnt[y] = 0
         base_self.__real_cnt[y] += base_self.__real_cnt[x]
         base_self.__real_cnt.pop(x)
@@ -145,10 +145,10 @@ class BaseLoadDataset():
                     base_self.__label_cnt[x] += sub_set.shape[0]
             df_ans = CustomMerger().fit_transform([df_ans] + list_ss)
         
-            print("Update label:")
-            print(base_self.__label_cnt)
-            print("Time load:", time.time() - time_file)
-            print(f"========================== Finish {file} =================================")
+            base_self.__print("Update label:")
+            base_self.__print(base_self.__label_cnt)
+            base_self.__print("Time load:", time.time() - time_file)
+            base_self.__print(f"========================== Finish {file} =================================")
 
     
     print("Total time load:", time.time() - tt_time)
