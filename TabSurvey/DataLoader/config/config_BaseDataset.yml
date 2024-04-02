@@ -1,0 +1,25 @@
+#Info of the dataset
+ds_name: "" #Required
+ds_size: None
+ds_paper_link: ""
+ds_link: "" #Required
+csv_link: None
+fts_names: [ ] #Required
+target_variable: "" #Required
+
+# Actual number of samples in the csv file of each class
+real_cnt: { } #Required
+
+# Map the actual label in the csv file with the label in the paper
+label_map: { }
+
+# Group the actual label in the csv file with the coresponding category in the paper
+category_map: { } #Required
+binary_map: { } #Required
+
+# Map the actual label in the csv file with the label in the paper
+label_true_name: [ ] #Required
+
+ # List the label be dropped
+label_drop: [ ]
+  

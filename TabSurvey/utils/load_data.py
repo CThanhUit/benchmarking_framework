@@ -58,9 +58,9 @@ def load_data(args):
         if os.path.isfile(file_path):
             df = pd.read_csv(file_path, low_memory=False)
         else:
-            dt = CICDDoS2019()
-            dt.DownLoad_Data(load_type="raw")
-            dt.Load_Data(load_type="raw", limit_cnt=50000)
+            dt = BaseLoadDataset("CICDDoS2019")
+            dt.DownLoad_Data(datadir = folder_path, load_type="raw")
+            dt.Load_Data(datadir = folder_path, load_type="raw", limit_cnt=50000)
             dt.Preprocess_Data()
             df = dt.To_dataframe()
             df = df.dropna()
@@ -86,8 +86,8 @@ def load_data(args):
             df = pd.read_csv(file_path, low_memory=False)
         else:
             dt = BaseLoadDataset("CICMalMem2022")
-            dt.DownLoad_Data(load_type="raw")
-            dt.Load_Data(load_type="raw", limit_cnt=50000)
+            dt.DownLoad_Data(datadir = folder_path, load_type="raw")
+            dt.Load_Data(datadir = folder_path, load_type="raw", limit_cnt=50000)
             dt.Preprocess_Data()
             df = dt.To_dataframe()
             df = df.dropna()
@@ -113,8 +113,8 @@ def load_data(args):
             df = pd.read_csv(file_path, low_memory=False)
         else:
             dt = BaseLoadDataset("CICIDS2018")
-            dt.DownLoad_Data(load_type="raw")
-            dt.Load_Data(load_type="raw", limit_cnt=50000)
+            dt.DownLoad_Data(datadir = folder_path, load_type="raw")
+            dt.Load_Data(datadir = folder_path, load_type="raw", limit_cnt=50000)
             dt.Preprocess_Data()
             df = dt.To_dataframe()
             df = df.dropna()
