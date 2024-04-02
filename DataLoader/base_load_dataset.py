@@ -147,7 +147,7 @@ class BaseLoadDataset():
         
             base_self.__print("Update label:")
             base_self.__print(base_self.__label_cnt)
-            base_self.__print("Time load:", time.time() - time_file)
+            base_self.__print("Time load:" + time.time() + time_file)
             base_self.__print(f"========================== Finish {file} =================================")
 
     
@@ -183,11 +183,11 @@ class BaseLoadDataset():
 
   def Add_more_fts(base_self):
     #Add more features
-    base_self.__print("=================================== Add more features ===================================")
+    print("===================================== Add more features ====================================")
     base_self.__data_df = base_self._add_mode_features(base_self._data_df)
     base_self.__data_df.dropna(inplace =True)
     base_self.__data_df.drop(columns=['1'],inplace =True)
-    base_self.__print("=================================== Done Add more features ===================================")
+    print("================================== Done Add more features ==================================")
     return
 
 
@@ -206,9 +206,9 @@ class BaseLoadDataset():
         print("Data already!!! No need to download.")
         return
       else:
-        print("=================================== File Data not found!!! Start downloading ===================================")
+        print("======================== File Data not found!!! Start downloading ==========================")
         print("File saved at:", base_self.__download(data_url, datapath))
-        print("================================ End download data ================================")
+        print("================================== End download data =======================================")
         return 
     
     if load_type=="raw":
@@ -219,21 +219,21 @@ class BaseLoadDataset():
         print("Data already!!! No need to download.")
         return
       else:
-        print("=================================== Folder Data not found!!! Start downloading ===================================")
+        print("======================== Folder Data not found!!! Start downloading ========================")
         if os.path.exists(data_file) == False:
-          print("=================================== File Data Zip not found!!! Start downloading ===================================")
+          print("======================== File Data Zip not found!!! Start downloading ======================")
           print("File saved at:", base_self.__download(data_url, data_file))
-          print("================================ End download data ================================")
+          print("===================================== End download data ====================================")
         if is_zipfile(data_file):
-          print("=================================== Unzipping Data!!!===================================")
+          print("====================================== Unzipping Data!!! ===================================")
           os.makedirs(data_dir, exist_ok=True)
           with ZipFile(data_file,"r") as zip_ref:
             for file in tqdm(iterable=zip_ref.namelist(), total=len(zip_ref.namelist())):
               zip_ref.extract(member=file, path=data_dir)
           print("File saved at:", datadir)
-          print("=================================== End download data ===================================")
+          print("===================================== End download data ====================================")
         else:
-          print("=================================== Zip file not valid!!! ===================================")
+          print("=================================== Zip file not valid!!! ==================================")
       return 
 
   #=========================================================================================================================================
@@ -242,10 +242,10 @@ class BaseLoadDataset():
     if load_type=="preload":
       datapath = os.path.join(datadir, (base_self.__ds_name + "_dataloader.csv"))
       if os.path.exists(datapath) == True:
-        print("================================ Start load data ================================")
+        print("====================================== Start load data =======================================")
         base_self.__data_df =  pd.read_csv(datapath, index_col=None, header=0)
         base_self.__reDefineLabel()
-        print("================================ Data loaded ================================")
+        print("======================================== Data loaded =========================================")
         return
       else:
         print("=================================== File Data not found!!! ===================================")
@@ -254,13 +254,13 @@ class BaseLoadDataset():
     if load_type=="raw":
       datapath = os.path.join(datadir, base_self.__ds_name)
       if os.path.exists(datapath) == True:
-        print("================================ Start load data ================================")
+        print("====================================== Start load data =======================================")
         base_self.__load_raw_default(datapath, limit_cnt, frac)
         base_self.__reDefineLabel()
-        print("================================ Data loaded ================================")
+        print("======================================== Data loaded =========================================")
         return
       else:
-        print("=================================== Folder Data not found!!! Please download first ===================================")
+        print("===================== Folder Data not found!!! Please download first =========================")
       return
 
   #=========================================================================================================================================
@@ -306,7 +306,7 @@ class BaseLoadDataset():
     print("============================= Show basic analysis of data frame ==============================")
     print("====================================== Dataframe be like =====================================")
     print('\n' + tabulate(base_self.__data_df.head(5), headers='keys', tablefmt='psql'))
-    print("=================================== Data info:")
+    print("========================================== Data info =========================================")
     print(base_self.__data_df.info())
     print("====================================== Label distribution ====================================")
     print(base_self.__data_df[base_self.__target_variable].value_counts())
