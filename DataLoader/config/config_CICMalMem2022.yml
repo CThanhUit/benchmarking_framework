@@ -2,7 +2,7 @@
 ds_name : "CICMalMem2022"
 ds_size : None
 ds_paper_link : "https://www.unb.ca/cic/datasets/malmem-2022.html"
-ds_link : "http://clouds.iec-uit.com/iec-iot-2021.idsdatasets/CICIMalMem2022.zip"
+ds_link : "http://clouds.iec-uit.com/iec-iot-2021.idsdatasets/CICMalMem2022.zip"
 csv_link : None
 
 fts_names : [
