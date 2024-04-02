@@ -2,7 +2,7 @@
 ds_name: "CICIDS2018"
 ds_size: None
 ds_paper_link: "https://www.unb.ca/cic/datasets/ids-2018.html",
-ds_link: "https://drive.usercontent.google.com/download?id=14mKey6EvYcZCVpvq7bUFrevQgikn32M1&export=download&authuser=1&confirm=t&uuid=da0258f8-c188-447e-9a09-7477645d7f4b&at=APZUnTVRRCucNSYnZApb31sUzpEX:1695972820074",
+ds_link: "https://drive.google.com/uc?export=download&id=14mKey6EvYcZCVpvq7bUFrevQgikn32M1"
 csv_link: None
 fts_names: [ 
     "Dst Port", "Protocol", "Timestamp", "Flow Duration", "Tot Fwd Pkts",
