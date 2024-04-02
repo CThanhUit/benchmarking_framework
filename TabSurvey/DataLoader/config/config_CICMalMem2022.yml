@@ -1,14 +1,11 @@
-__ds_name = "CICMalMem2022"
 
-__ds_size = None
+ds_name : "CICMalMem2022"
+ds_size : None
+ds_paper_link : "https://www.unb.ca/cic/datasets/malmem-2022.html"
+ds_link : "https://drive.usercontent.google.com/download?id:1Lz07kYeIi1UXmwhHL6f52gPc8sbZxp2D&export:download&authuser:1&confirm:t&uuid:1c61797e-da84-478d-accb-81d313132bd6&at:APZUnTWwHcF_VwigcmUU76mMjrgN:1695918496913"
+csv_link : None
 
-__ds_paper_link = "https://www.unb.ca/cic/datasets/malmem-2022.html"
-
-__ds_link = "https://drive.usercontent.google.com/download?id=1Lz07kYeIi1UXmwhHL6f52gPc8sbZxp2D&export=download&authuser=1&confirm=t&uuid=1c61797e-da84-478d-accb-81d313132bd6&at=APZUnTWwHcF_VwigcmUU76mMjrgN:1695918496913"
-
-__csv_link = None
-
-__fts_names = [
+fts_names : [
        'Category', 'pslist.nproc', 'pslist.nppid', 'pslist.avg_threads',
        'pslist.nprocs64bit', 'pslist.avg_handlers', 'dlllist.ndlls',
        'dlllist.avg_dlls_per_proc', 'handles.nhandles',
@@ -37,8 +34,8 @@ __fts_names = [
        'callbacks.ncallbacks', 'callbacks.nanonymous', 'callbacks.ngeneric',
        'Class'
     ]
-__target_variable = "Category"
-__real_cnt = {
+target_variable : "Category"
+real_cnt : {
         'Benign':                   29298,
         'Spyware-Transponder':      2410,
         'Spyware-Gator':            2200,
@@ -55,46 +52,46 @@ __real_cnt = {
         'Ransomware-Pysa':          1717,
         'Trojan-Reconyc':           1570,
         'Spyware-TIBS':             1410
-    }  # Actual number of samples in the csv file of each class
-__label_map = {
-    } # Map the actual label in the csv file with the label in the paper
-__category_map = {
+    }  
+label_map : {
+    } 
+category_map : {
         'Benign':                   'Benign',
-        'Trojan-Refroso':           'Malware',
-        'Trojan-Scar':              'Malware',
-        'Trojan-Reconyc':           'Malware',
-        'Trojan-Zeus':              'Malware',
-        'Trojan-Emotet':            'Malware',
-        'Spyware-Transponder':      'Malware',
-        'Spyware-TIBS':             'Malware',
-        'Spyware-Gator':            'Malware',
-        'Spyware-180solutions':     'Malware',
-        'Spyware-CWS':              'Malware',
-        'Ransomware-Shade':         'Malware',
-        'Ransomware-Ako':           'Malware',
-        'Ransomware-Conti':         'Malware',      
-        'Ransomware-Maze':          'Malware',      
-        'Ransomware-Pysa':          'Malware'
-    } # Group the actual label in the csv file with the coresponding category in the paper
-__binary_map = {
-        'Benign':                   0,
-        'Trojan-Refroso':           1,
-        'Trojan-Scar':              1,
-        'Trojan-Reconyc':           1,
-        'Trojan-Zeus':              1,
-        'Trojan-Emotet':            1,
-        'Spyware-Transponder':      1,
-        'Spyware-TIBS':             1,
-        'Spyware-Gator':            1,
-        'Spyware-180solutions':     1,
-        'Spyware-CWS':              1,
-        'Ransomware-Shade':         1,
-        'Ransomware-Ako':           1,
-        'Ransomware-Conti':         1,      
-        'Ransomware-Maze':          1,      
-        'Ransomware-Pysa':          1
+        'Trojan-Refroso':           'Trojan',
+        'Trojan-Scar':              'Trojan',
+        'Trojan-Reconyc':           'Trojan',
+        'Trojan-Zeus':              'Trojan',
+        'Trojan-Emotet':            'Trojan',
+        'Spyware-Transponder':      'Spyware',
+        'Spyware-TIBS':             'Spyware',
+        'Spyware-Gator':            'Spyware',
+        'Spyware-180solutions':     'Spyware',
+        'Spyware-CWS':              'Spyware',
+        'Ransomware-Shade':         'Ransomware',
+        'Ransomware-Ako':           'Ransomware',
+        'Ransomware-Conti':         'Ransomware',      
+        'Ransomware-Maze':          'Ransomware',      
+        'Ransomware-Pysa':          'Ransomware'
     }
-__label_true_name = [
+binary_map : {
+        'Benign':                   'Benign',
+        'Trojan-Refroso':           'Malicious',
+        'Trojan-Scar':              'Malicious',
+        'Trojan-Reconyc':           'Malicious',
+        'Trojan-Zeus':              'Malicious',
+        'Trojan-Emotet':            'Malicious',
+        'Spyware-Transponder':      'Malicious',
+        'Spyware-TIBS':             'Malicious',
+        'Spyware-Gator':            'Malicious',
+        'Spyware-180solutions':     'Malicious',
+        'Spyware-CWS':              'Malicious',
+        'Ransomware-Shade':         'Malicious',
+        'Ransomware-Ako':           'Malicious',
+        'Ransomware-Conti':         'Malicious',
+        'Ransomware-Maze':          'Malicious',
+        'Ransomware-Pysa':          'Malicious'
+    }
+label_true_name : [
         'Benign',
         'Trojan-Refroso',
         'Trojan-Scar',
@@ -111,7 +108,5 @@ __label_true_name = [
         'Ransomware-Conti',       
         'Ransomware-Maze',    
         'Ransomware-Pysa'
-    ] # Map the actual label in the csv file with the label in the paper
-__label_drop = [] # List the label be dropped
-__label_cnt = {} # Actual number of samples loaded by function
-__error_cnt = 0
+    ]
+label_drop : ["Category"] 

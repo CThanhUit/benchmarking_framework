@@ -1,21 +1,24 @@
 from DataLoader.utils import *
+import os
+import sys
+from tabulate import tabulate
 from zipfile import ZipFile, is_zipfile
 from tqdm.auto import tqdm
 import time 
 import yaml
 import numpy as np
 import pandas as pd
+import plt
 SEED = 42
 
 
 
 class BaseLoadDataset():
 
-  def __init__(base_self, dataset_name = None, seed = SEED, print_able = True, save_csv = True) -> None:
+  def __init__(base_self, dataset_name = None, seed = SEED, print_able = True) -> None:
     np.random.seed(seed)
     np.set_printoptions(suppress=True)
     base_self.__PRINT_ABLE = print_able
-    base_self.__SAVE_CSV = save_csv
     base_self.__data_df = pd.DataFrame()
 
     base_self.__ds_name = None
@@ -31,10 +34,10 @@ class BaseLoadDataset():
     base_self.__binary_map = {}
     base_self.__label_true_name = [] # Map the actual label in the csv file with the label in the paper
     base_self.__label_drop = [] # List the label be dropped
-    base_self.__label_cnt = {} # Actual number of samples loaded by function
+    base_self.__label_cnt = { } # Actual number of samples loaded by function
     base_self.__error_cnt = 0
     base_self.__set_config(dataset_name)
-    base_self.Show_basic_metadata()
+    base_self.__print()
     base_self.__fixLabel()
 
 
@@ -43,13 +46,13 @@ class BaseLoadDataset():
     if dataset_name is None:
       print("Dataset not found!")
     else:
-      config_setting_path = 'DataLoader/config/config_' + dataset_name + '.json'
+      config_setting_path = 'DataLoader/config/config_' + dataset_name + '.yml'
       config_settings = {}
+      if os.path.exists(config_setting_path)==False:
+        raise FileNotFoundError(f'Not found `{config_setting_path}`!')
       with open(config_setting_path, 'r') as config_file:
         config_settings = yaml.safe_load(config_file)
-      if config_settings is None:
-        print("Not found file config!")
-      else:
+      try:
         base_self.__target_variable = (config_settings['target_variable'])
         base_self.__fts_names = (config_settings['fts_names'])
         base_self.__real_cnt = (config_settings['real_cnt'])
@@ -58,21 +61,23 @@ class BaseLoadDataset():
         base_self.__binary_map = (config_settings['binary_map'])
         base_self.__label_true_name = (config_settings['label_true_name'])
         base_self.__label_drop = (config_settings['label_drop'])
-        base_self.__label_cnt = (config_settings['label_cnt'])
-        base_self.__error_cnt = (config_settings['error_cnt'])
         base_self.__ds_name = (config_settings['ds_name'])
         base_self.__ds_size = (config_settings['ds_size'])
         base_self.__ds_paper_link = (config_settings['ds_paper_link'])
         base_self.__ds_link = (config_settings['ds_link'])
         base_self.__csv_link = (config_settings['csv_link'])
+      except KeyError as e:
+        print(f"KeyError: {e} in {config_setting_path}")
 
-  def __print(base_self, str) -> None:
+  def __print(base_self) -> None:
     if base_self.__PRINT_ABLE:
-      print(str)
+        base_self.Show_basic_metadata()
 
   def __add_mode_features(base_self, dataset, FLAG_GENERATING: bool = False) -> pd.DataFrame:
     pass
-  
+
+  #=========================================================================================================================================
+
   def __fixLabel(base_self):
     for x in base_self.__label_map:
       y = base_self.__label_map[x]
@@ -85,12 +90,16 @@ class BaseLoadDataset():
     base_self.__print("True count:")
     base_self.__print(base_self.__real_cnt)
 
+  #=========================================================================================================================================
+
   def __reDefineLabel(base_self):
     # base_self.__data_df.rename(columns = {base_self.__target_variable: 'Label'}, inplace = True, errors='ignore')
     # base_self.__target_variable='Label'
     base_self.__data_df['Category_dtloader'] = base_self.__data_df[base_self.__target_variable].apply(lambda x: base_self.__category_map[x] if x in base_self.__category_map else x)
     base_self.__data_df['Binary_dtloader'] = base_self.__data_df[base_self.__target_variable].apply(lambda x: base_self.__binary_map[x] if x in base_self.__binary_map else x)
     return base_self.__data_df
+
+  #=========================================================================================================================================
 
   def __load_raw_default(base_self, dir_path, limit_cnt:sys.maxsize, frac = None):
     base_self.__label_cnt = {}
@@ -284,21 +293,6 @@ class BaseLoadDataset():
     return X        
 
   #=========================================================================================================================================
-  
-  def Preprocess_Data(base_self, target_variable=None):
-    if target_variable==None:
-      target_variable=base_self.__target_variable
-    print("=================================== Preprocess Data ===================================")
-    df = base_self.__data_df
-    # df = df.drop(columns=['Unnamed: 0', 'Flow ID', ' Source IP', ' Source Port', ' Destination IP', ' Destination Port', ' Timestamp'], axis=1)
-    print("Start cleanning data")
-    df = base_self.Clean_Data(df, target_variable)
-    print('Remove old Dataframe')
-    base_self.__data_df = df
-    print("=======================================================================================")
-    return
-
-  #=========================================================================================================================================
 
   def Show_basic_metadata(base_self):
     print("=================================== Show dataset metadata ===================================")
@@ -319,7 +313,7 @@ class BaseLoadDataset():
     print(base_self.__data_df.info())
     print("====================================== Label distribution ====================================")
     print(base_self.__data_df[base_self.__target_variable].value_counts())
-    # plt.show()
+
   #=========================================================================================================================================
   
   def To_dataframe(base_self):
@@ -336,35 +330,3 @@ class BaseLoadDataset():
       base_self.__data_df.to_csv(data_file, index=True)
       print("File saved at:", data_file)
     return
-  #=========================================================================================================================================
-
-  # def Train_test_split(base_self, testsize=0.2, target_variable=None, type_classification='binary'):
-  #   if target_variable==None:
-  #     target_variable=base_self.__target_variable
-  #   print("=================================== Begin Split File ===================================")
-  #   df = base_self.__data_df
-  #   print("=================================== Dataframe be like ==================================")
-  #   print('\n' + tabulate(base_self.__data_df.head(5), headers='keys', tablefmt='psql'))
-
-  #   df_X = df.drop(columns = [target_variable])
-  #   df_y = df[target_variable]
-
-  #   if type_classification == 'binary':
-  #     df_y = df_y.apply(lambda x: 0 if x == "BenignTraffic" else 1)
-  #   elif type_classification == 'multiclass':
-  #     df_y = LabelEncoder().fit_transform(df_y)
-
-  #   X_train, X_test, y_train, y_test = train_test_split(df_X, df_y,    
-  #                                                       test_size=testsize, random_state=42)
-
-  #   print("Training data shape:",X_train.shape, y_train.shape)
-  #   print("Testing data shape:",X_test.shape, y_test.shape)
-
-  #   print("Label Train count:")
-  #   unique= np.bincount(y_train)
-  #   print(np.asarray((unique)))
-  #   print("Label Test count:")
-  #   unique= np.bincount(y_test)
-  #   print(np.asarray((unique)))
-  #   print("=================================== Split File End ====================================")
-  #   return X_train, X_test, y_train, y_test
