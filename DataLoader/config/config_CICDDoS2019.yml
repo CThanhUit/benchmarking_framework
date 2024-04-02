@@ -1,8 +1,8 @@
 # Info of the dataset
 ds_name: "CICDDoS2019"
 ds_size: None
-ds_paper_link: "http://clouds.iec-uit.com/iec-iot-2021.idsdatasets/CICDDoS2019.zip"
-ds_link: "https://drive.google.com/uc?export=download&id=1kxYjcNm7Q8QOn2Ou5MzVwOl-gzqRyHln"
+ds_paper_link: "https://www.unb.ca/cic/datasets/ddos-2019.html"
+ds_link: "http://clouds.iec-uit.com/iec-iot-2021.idsdatasets/CICDDoS2019.zip"
 csv_link: None
 fts_names: [
     "Unnamed: 0", "Flow ID", " Source IP", " Source Port",

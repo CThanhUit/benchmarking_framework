@@ -2,7 +2,7 @@
 ds_name: "CICIDS2018"
 ds_size: None
 ds_paper_link: "https://www.unb.ca/cic/datasets/ids-2018.html",
-ds_link: "https://drive.google.com/uc?export=download&id=14mKey6EvYcZCVpvq7bUFrevQgikn32M1"
+ds_link: "http://clouds.iec-uit.com/iec-iot-2021.idsdatasets/CICIDS2018.zip"
 csv_link: None
 fts_names: [ 
     "Dst Port", "Protocol", "Timestamp", "Flow Duration", "Tot Fwd Pkts",

@@ -2,7 +2,7 @@
 ds_name: "CICIDS2017"
 ds_size: None
 ds_paper_link: "https://www.unb.ca/cic/datasets/ids-2017.html",
-ds_link: "https://drive.google.com/uc?export=download&id=1pnbMMsNYvJeF2rDAPNgKZi0WgXeJWXYN"
+ds_link: "http://clouds.iec-uit.com/iec-iot-2021.idsdatasets/CICIDS2017.zip"
 csv_link: None
 fts_names: [
     " Destination Port", " Flow Duration", " Total Fwd Packets",
