@@ -8,10 +8,7 @@ import time
 import yaml
 import numpy as np
 import pandas as pd
-import plt
 SEED = 42
-
-
 
 class BaseLoadDataset():
 
@@ -268,29 +265,29 @@ class BaseLoadDataset():
 
   #=========================================================================================================================================
   
-  def Clean_Data(base_self, df, target_variable=None):
-    # Remove duplicated samples (rows)
-    df = df.drop_duplicates()
-    # Impute missing data or infinite values with mean value of each feature
-    if target_variable is None:
-        X = df
-    else:
-        X = df.drop(target_variable, axis=1)
-    # Remove zero features (columns)
-    X = X.loc[:, (X != 0).any()]    
-    # Remove duplicated features (columns)
-    X = X.loc[:, ~X.columns.duplicated()]
+  # def Clean_Data(base_self, df, target_variable=None):
+  #   # Remove duplicated samples (rows)
+  #   df = df.drop_duplicates()
+  #   # Impute missing data or infinite values with mean value of each feature
+  #   if target_variable is None:
+  #       X = df
+  #   else:
+  #       X = df.drop(target_variable, axis=1)
+  #   # Remove zero features (columns)
+  #   X = X.loc[:, (X != 0).any()]    
+  #   # Remove duplicated features (columns)
+  #   X = X.loc[:, ~X.columns.duplicated()]
 
-    X.replace([np.inf, -np.inf], np.nan, inplace=True)
+  #   X.replace([np.inf, -np.inf], np.nan, inplace=True)
 
-    # Concatenate the target variable (if any) and the reduced feature DataFrame
-    if target_variable in df.columns:
-        y = df[target_variable]
-        y.reset_index(drop=True, inplace=True)
-        X.reset_index(drop=True, inplace=True)
-        X = pd.concat([X, y], axis=1)
+  #   # Concatenate the target variable (if any) and the reduced feature DataFrame
+  #   if target_variable in df.columns:
+  #       y = df[target_variable]
+  #       y.reset_index(drop=True, inplace=True)
+  #       X.reset_index(drop=True, inplace=True)
+  #       X = pd.concat([X, y], axis=1)
 
-    return X        
+  #   return X        
 
   #=========================================================================================================================================
 

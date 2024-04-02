@@ -1,8 +1,8 @@
 #Info of the dataset
 ds_name: "CICDDoS2019"
 ds_size: None
-ds_paper_link: "https://s3-hcm-r1.longvan.net/19414866-ids-datasets/CICDDoS2019/CICDDoS2019.zip"
-ds_link: "https://s3-hcm-r1.longvan.net/19414866-ids-datasets/CICDDoS2019/CICDDoS2019_clean_data_ver_30k_42seed.csv"
+ds_paper_link: "http://clouds.iec-uit.com/iec-iot-2021.idsdatasets/CICDDoS2019.zip"
+ds_link: None
 csv_link: None
 fts_names: [
     "Unnamed: 0", "Flow ID", " Source IP", " Source Port",
