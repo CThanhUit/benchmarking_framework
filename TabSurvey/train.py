@@ -73,7 +73,7 @@ def cross_validation(model, X, y, args, save_model=False):
                              model.params)
 
     # print("Finished cross validation")
-    return sc, {'avg_train_time': train_timer.get_average_time(), 'avg_test_time': test_timer.get_average_time()}
+    return sc, {'train_time': train_timer.get_average_time(), 'test_time': test_timer.get_average_time()}
 
 
 class Objective(object):
@@ -138,9 +138,18 @@ def main_once(args):
     # /////////////////////////////////////////////////////////
     result = sc.get_results()
     print("Results:", result)
-    print("Avegare Train time:", timer['avg_train_time'])
-    print("Avegare Test time:", timer['avg_test_time'])
-    folder_path = "/content/"
+    print("Avegare Train time:", timer['train_time'])
+    print("Avegare Test time:", timer['test_time'])
+
+    new_data = {}
+    new_data["Name"]=args.dataset
+    new_data["Model"]=args.model_name
+    for key, value in result.items():
+      new_data[key]=result[key]
+    new_data["train_time"]=timer['train_time']
+    new_data["test_time"]=timer['test_time']
+    new_df = pd.DataFrame(new_data, index=[0])
+    folder_path = "./output"
     if os.path.exists(folder_path):
         os.makedirs(folder_path, exist_ok=True)
     file_path = os.path.join(folder_path, "report_tabsurvey.csv")
@@ -149,21 +158,13 @@ def main_once(args):
 
         df = pd.read_csv(file_path)
         # Thêm dữ liệu mới vào dataframe đã tồn tại
-
-        # new_data = pd.DataFrame(result, orient='index', columns=["Value"])
-        new_data = pd.DataFrame([result.values()], columns=result.keys())
-        new_data.insert(0, "Name", args.dataset)
-        new_data.insert(1, "Model", args.model_name)
-        df = pd.concat([df, new_data], ignore_index=True)
-        
+        df = pd.concat([df, new_df], ignore_index=True)
         # Lưu dữ liệu mới vào file pandas
         df.to_csv(file_path, index=False)
     else:
         print("---Create new report!----")
         # Tạo dataframe mới và lưu vào file pandas
-        df = pd.DataFrame([result.values()], columns=result.keys())
-        df.insert(0, "Name", args.dataset)
-        df.insert(1, "Model", args.model_name)
+        df = new_df
         df.to_csv(file_path, index=False)
     # ////////////////////////////////////////////////////////
     # print(time)

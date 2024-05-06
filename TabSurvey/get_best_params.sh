@@ -6,7 +6,7 @@ EPOCHS=3
 MODELS=(  "XGBoost" "LightGBM" "KNN" "SAINT" "TabTransformer" "TabNet" 
           )
 
-CONFIGS=( "config/CICIDS2018.yml"
+CONFIGS=( "config/CICIoT2023.yml"
           )
 
 for config in "${CONFIGS[@]}"; do

@@ -6,6 +6,8 @@ import pandas as pd
 
 
 ###########################
+import sys
+sys.path.append('../')
 import DataLoader
 from DataLoader import *
 import os
@@ -47,6 +49,33 @@ def load_data(args):
             args.cat_idx = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
         X = df[features].to_numpy()
         y = df[label].to_numpy()
+# ================================================== CICIoT2023 ==========================================
+    elif args.dataset == "CICIoT2023":
+        folder_path = "/content/datasets"
+        if not os.path.exists(folder_path):
+              os.makedirs(folder_path)
+        file_name = "CICIoT2023_dataloader.csv"
+        file_path = os.path.join(folder_path, file_name)
+        label = "Category_dtloader"
+        if os.path.isfile(file_path):
+            df = pd.read_csv(file_path, low_memory=False)
+        else:
+            dt = BaseLoadDataset("CICIoT2023")
+            dt.DownLoad_Data(datadir = folder_path, load_type="raw")
+            dt.Load_Data(datadir = folder_path, load_type="raw", limit_cnt=50000)
+            dt.Preprocess_Data()
+            df = dt.To_dataframe()
+            df = df.dropna()
+            for feature in df.drop(columns=label).columns.tolist():
+                if df[feature].dtypes == 'object':
+                    le = LabelEncoder()
+                    df[feature]=df[feature].astype('str')
+                    df[feature] = le.fit_transform(df[feature])
+            df=df.drop(columns = ['Unnamed: 0', 'Flow ID',' Source IP', ' Destination IP', ' Timestamp',	'Binary_dtloader', ' Label'])
+            df.to_csv(file_path, index=False)
+        features = df.drop(columns=label).columns.tolist()
+        X=df[features].to_numpy()
+        y=df[label].to_numpy()
 # ================================================== CICDDoS2019 ==========================================
     elif args.dataset == "CICDDoS2019":
         folder_path = "/content/datasets"
@@ -111,6 +140,7 @@ def load_data(args):
         label = "Binary_dtloader"
         if os.path.isfile(file_path):
             df = pd.read_csv(file_path, low_memory=False)
+            df = df.dropna()
         else:
             dt = BaseLoadDataset("CICIDS2018")
             dt.DownLoad_Data(datadir = folder_path, load_type="raw")

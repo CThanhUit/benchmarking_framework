@@ -3,11 +3,10 @@
 N_TRIALS=2
 EPOCHS=3
 
-MODELS=(  "LinearModel" "KNN" "SVM" "DecisionTree" "RandomForest" "XGBoost" "CatBoost" "LightGBM" "MLP" "TabNet" "VIME" 
-          "TabTransformer" "ModelTree" "NODE" "DeepGBM" "RLN" "DNFNet" "STG" "NAM" "DeepFM" "SAINT" "DANet"
+MODELS=(  "XGBoost" "LightGBM" "KNN" "SAINT" "TabTransformer" "TabNet" 
           )
 
-CONFIGS=( "config/CICDDoS2019.yml"
+CONFIGS=( "config/CICIDS2018.yml"
           )
 
 for config in "${CONFIGS[@]}"; do
