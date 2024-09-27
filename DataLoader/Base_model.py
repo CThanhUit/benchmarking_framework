@@ -6,7 +6,6 @@ import time
 SEED = 42
 
 # Rules for naming variables and functions
-
 # Public:
 # Method: 
     # - Viết in hoa chữ cái đầu

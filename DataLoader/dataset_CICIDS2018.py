@@ -612,7 +612,7 @@ class CICIDS2018():
     Parameters:
       None
     Returns:
-      A pandas DataFrame
+      A pandas DataFrame.
     """
     return base_self.__data_df
 
