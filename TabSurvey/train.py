@@ -7,13 +7,14 @@ from models import str2model
 from utils.load_data import load_data
 from utils.scorer import get_scorer
 from utils.timer import Timer
-from utils.io_utils import save_results_to_file, save_hyperparameters_to_file, save_loss_to_file
+from utils.io_utils import save_results_to_file, save_hyperparameters_to_file, save_loss_to_file, save_reports_to_csv_file, save_plot_confusion_matrix
 from utils.parser import get_parser, get_given_parameters_parser
 
 from sklearn.model_selection import KFold, StratifiedKFold  # , train_test_split
 
 # save report
 import pandas as pd
+import numpy as np
 import os
 
 def cross_validation(model, X, y, args, save_model=False):
@@ -48,18 +49,18 @@ def cross_validation(model, X, y, args, save_model=False):
         test_timer.start()
         curr_model.predict(X_test)
         test_timer.end()
-
+        
         # Save model weights and the truth/prediction pairs for traceability
         curr_model.save_model_and_predictions(y_test, i)
-
+        
+        # Compute scores on the output
+        print(sc.eval(y_test, curr_model.predictions, curr_model.prediction_probabilities))
+        
         if save_model:
             save_loss_to_file(args, loss_history, "loss", extension=i)
             save_loss_to_file(args, val_loss_history, "val_loss", extension=i)
+            save_plot_confusion_matrix(args ,sc.get_confusion_matrix(), args.label_classes, extension=i, figsize=(len(np.unique(y_test)), len(np.unique(y_test))*0.8))
 
-        # Compute scores on the output
-        sc.eval(y_test, curr_model.predictions, curr_model.prediction_probabilities)
-
-        print(sc.get_results())
 
     # Best run is saved to file
     if save_model:
@@ -71,7 +72,8 @@ def cross_validation(model, X, y, args, save_model=False):
         save_results_to_file(args, sc.get_results(),
                              train_timer.get_average_time(), test_timer.get_average_time(),
                              model.params)
-
+        save_reports_to_csv_file(args, sc.get_results(),
+                             train_timer.get_average_time(), test_timer.get_average_time())
     # print("Finished cross validation")
     return sc, {'train_time': train_timer.get_average_time(), 'test_time': test_timer.get_average_time()}
 
@@ -121,8 +123,13 @@ def main(args):
 
     # Run best trial again and save it!
     model = model_name(study.best_trial.params, args)
-    cross_validation(model, X, y, args, save_model=True)
-
+    sc, timer=cross_validation(model, X, y, args, save_model=True)
+    # /////////////////////////////////////////////////////////
+    result = sc.get_results()
+    print("Results:", result)
+    print("Avegare Train time:", timer['train_time'])
+    print("Avegare Test time:", timer['test_time'])
+    # ////////////////////////////////////////////////////////
 
 def main_once(args):
     print("Train model with given hyperparameters")
@@ -140,34 +147,7 @@ def main_once(args):
     print("Results:", result)
     print("Avegare Train time:", timer['train_time'])
     print("Avegare Test time:", timer['test_time'])
-
-    new_data = {}
-    new_data["Name"]=args.dataset
-    new_data["Model"]=args.model_name
-    for key, value in result.items():
-      new_data[key]=result[key]
-    new_data["train_time"]=timer['train_time']
-    new_data["test_time"]=timer['test_time']
-    new_df = pd.DataFrame(new_data, index=[0])
-    folder_path = "./output"
-    if os.path.exists(folder_path):
-        os.makedirs(folder_path, exist_ok=True)
-    file_path = os.path.join(folder_path, "report_tabsurvey.csv")
-    if os.path.exists(file_path):
-        # Đọc dữ liệu từ file pandas đã tồn tại
-
-        df = pd.read_csv(file_path)
-        # Thêm dữ liệu mới vào dataframe đã tồn tại
-        df = pd.concat([df, new_df], ignore_index=True)
-        # Lưu dữ liệu mới vào file pandas
-        df.to_csv(file_path, index=False)
-    else:
-        print("---Create new report!----")
-        # Tạo dataframe mới và lưu vào file pandas
-        df = new_df
-        df.to_csv(file_path, index=False)
     # ////////////////////////////////////////////////////////
-    # print(time)
 
 
 if __name__ == "__main__":

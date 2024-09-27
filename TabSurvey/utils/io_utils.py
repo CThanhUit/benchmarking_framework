@@ -1,9 +1,11 @@
 import numpy as np
+import pandas as pd
 import os
 import pickle
 import datetime
 import json
-
+import matplotlib.pyplot as plt
+import itertools
 output_dir = "output/"
 
 
@@ -65,8 +67,72 @@ def save_results_to_file(args, results, train_time=None, test_time=None, best_pa
 
         if best_params:
             text_file.write("\nBest Parameters: %s\n\n\n" % best_params)
-def save_reports_to_file(args, results, timer):
-  pass
+            
+def save_plot_confusion_matrix(args ,cm, target_names, extension=None, figsize=None, cmap=None, normalize=False):
+  
+    filename = get_output_path(args, directory="Confusion_matrix", filename="cfm", extension=extension, file_type="png")
+    
+    accuracy = np.trace(cm) / np.sum(cm).astype('float')
+    misclass = 1 - accuracy
+    if figsize is None:
+        figsize = (15, 12)
+    else:
+        x, y = figsize
+        if x < 15:
+            figsize = (15, 12)
+    if cmap is None:
+        cmap = plt.get_cmap('Blues')
+    norm_cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]*100
+    plt.figure(figsize=figsize)
+    plt.imshow(norm_cm, interpolation='nearest', cmap=cmap)
+    plt.colorbar()
+    
+    if target_names is not None:
+        tick_marks = np.arange(len(target_names))
+        plt.xticks(tick_marks, target_names, rotation=45, fontsize='large')
+        plt.yticks(tick_marks, target_names, fontsize='large')
+    
+    thresh = cm.max() / 1.5 if normalize else cm.max() / 2
+    thresh= 50
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, "{:,}\n{:0.2f}%".format(cm[i, j], norm_cm[i, j]),
+                horizontalalignment="center",
+                verticalalignment="center",
+                color="white" if norm_cm[i, j] > thresh else "black")
+    
+    plt.tight_layout()
+    plt.ylabel('True label', fontsize='x-large')
+    plt.xlabel('Predicted label', fontsize='x-large')
+    plt.savefig(filename, bbox_inches='tight')
+    plt.show()
+
+def save_reports_to_csv_file(args, results, train_time=None, test_time=None):
+    new_data = {}
+    new_data["Name"]=args.dataset
+    new_data["Model"]=args.model_name
+    for key, value in results.items():
+      new_data[key]=round(value, 5)
+    new_data["train_time"]=train_time
+    new_data["test_time"]=test_time
+    new_df = pd.DataFrame(new_data, index=[0])
+    
+    dir_path = output_dir
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    file_path = os.path.join(dir_path, "report_tabsurvey.csv")
+    
+    if os.path.exists(file_path):
+        # Read data from exist file
+        df = pd.read_csv(file_path)
+        # Add new data
+        df = pd.concat([df, new_df], ignore_index=True)
+        # Save report
+        df.to_csv(file_path, index=False)
+    else:
+        print("---Create new report!----")
+        # Create new report
+        df = new_df
+        df.to_csv(file_path, index=False)
 
 def save_hyperparameters_to_file(args, params, results, time=None):
     filename = get_output_path(args, filename="hp_log", file_type="txt")

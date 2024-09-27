@@ -17,8 +17,9 @@ class CICIoT2023():
     np.set_printoptions(suppress=True)
     base_self.__PRINT_ABLE = print_able
     base_self.__data_df = pd.DataFrame()
-    base_self.__target_variable = "label"
+    base_self.__target_variable = 'label'
     base_self.__label_fts_names = ['label']
+    
     base_self.__fts_names = [
       "flow_duration", "Header_Length", "Protocol type", "Duration", "Rate", "Srate", "Drate", "fin_flag_number",
       "syn_flag_number", "rst_flag_number", "psh_flag_number", "ack_flag_number", "ece_flag_number", "cwr_flag_number",
@@ -69,18 +70,18 @@ class CICIoT2023():
 
     base_self.__category_map = {
       'BenignTraffic':            'Benign',
-      'DDoS-ACK_Fragmentation':   'DoS',
-      'DDoS-UDP_Flood':           'DoS',
-      'DDoS-SlowLoris':           'DoS',
-      'DDoS-ICMP_Flood':          'DoS',
-      'DDoS-RSTFINFlood':         'DoS',
-      'DDoS-PSHACK_Flood':        'DoS',
-      'DDoS-HTTP_Flood':          'DoS',
-      'DDoS-UDP_Fragmentation':   'DoS',
-      'DDoS-ICMP_Fragmentation':  'DoS',
-      'DDoS-TCP_Flood':           'DoS',
-      'DDoS-SYN_Flood':           'DoS',
-      'DDoS-SynonymousIP_Flood':  'DoS',
+      'DDoS-ACK_Fragmentation':   'DDoS',
+      'DDoS-UDP_Flood':           'DDoS',
+      'DDoS-SlowLoris':           'DDoS',
+      'DDoS-ICMP_Flood':          'DDoS',
+      'DDoS-RSTFINFlood':         'DDoS',
+      'DDoS-PSHACK_Flood':        'DDoS',
+      'DDoS-HTTP_Flood':          'DDoS',
+      'DDoS-UDP_Fragmentation':   'DDoS',
+      'DDoS-ICMP_Fragmentation':  'DDoS',
+      'DDoS-TCP_Flood':           'DDoS',
+      'DDoS-SYN_Flood':           'DDoS',
+      'DDoS-SynonymousIP_Flood':  'DDoS',
       'DictionaryBruteForce':     'BruteForce',
       'MITM-ArpSpoofing':         'Spoofing',
       'DNS_Spoofing':             'Spoofing',
@@ -186,18 +187,19 @@ class CICIoT2023():
     base_self.__print(base_self.__real_cnt)
 
   def __reDefineLabel(base_self):
+    base_self.__print(f"Start Redefine Label.")
     base_self.__data_df.rename(columns = {base_self.__target_variable: 'Default_label'}, inplace = True, errors='ignore')
     base_self.__label_fts_names = ["Default_label" if x == base_self.__target_variable else x for x in base_self.__label_fts_names]
     base_self.__fts_names = ["Default_label" if x == base_self.__target_variable else x for x in base_self.__fts_names]
-    base_self.__target_variable='Default_label'
-    
-    base_self.__data_df['Category_label'] = base_self.__data_df[base_self.__target_variable].apply(lambda x: base_self.__category_map[x] if x in base_self.__category_map else x)
-    base_self.__label_fts_names.append('Category_label')
-    base_self.__fts_names.append('Category_label')
-
-    base_self.__data_df['Binary_label'] = base_self.__data_df[base_self.__target_variable].apply(lambda x: base_self.__binary_map[x] if x in base_self.__binary_map else x)
-    base_self.__label_fts_names.append('Binary_label')
-    base_self.__fts_names.append('Binary_label')
+    base_self.__target_variable = 'Default_label'
+    if 'Category_label' not in base_self.__fts_names:
+        base_self.__data_df['Category_label'] = base_self.__data_df[base_self.__target_variable].apply(lambda x: base_self.__category_map[x] if x in base_self.__category_map else x)
+        base_self.__label_fts_names.append('Category_label')
+        base_self.__fts_names.append('Category_label')
+    if 'Binary_label' not in base_self.__fts_names:
+        base_self.__data_df['Binary_label'] = base_self.__data_df[base_self.__target_variable].apply(lambda x: base_self.__binary_map[x] if x in base_self.__binary_map else x)
+        base_self.__label_fts_names.append('Binary_label')
+        base_self.__fts_names.append('Binary_label')
     return base_self.__data_df
 
   def __load_raw_default(base_self, dir_path, limit_cnt:sys.maxsize, frac = None):
@@ -243,7 +245,7 @@ class CICIoT2023():
             base_self.__print("Update label:")
             base_self.__print(base_self.__label_cnt)
             base_self.__print(f"Time load: {time.time() - time_file}")
-            base_self.__print(f"================================ Finish {file} ===================================")
+            print(f"================================ Finish {file} ===================================")
     
     print("Total time load:", time.time() - tt_time)
     base_self.__data_df = df_ans
@@ -279,27 +281,30 @@ class CICIoT2023():
   def __cleanData(base_self, drop_cols=None):
     df = base_self.__data_df
     if drop_cols is not None:
-      base_self.__print("Drop columns:", drop_cols)
-      df = df.drop(columns=drop_cols, axis=1)
+        for col_name in drop_cols: 
+            if col_name in base_self.__label_fts_names:
+                base_self.__label_fts_names.remove(col_name)
+        base_self.__print(f"Drop columns: {drop_cols}")
+        df = df.drop(columns=drop_cols, axis=1)
     base_self.__print(f"Start cleanning data for {base_self.__ds_name}")
     X = df.drop(base_self.__label_fts_names, axis=1)
 
     # Remove zero features (columns)
-    base_self.__print("Remove zero features (columns).")
+    base_self.__print(f"Remove zero features (columns).")
     zero_cols = X.columns[X.isna().all()]
     if len(zero_cols) > 0:
       base_self.__print(f"Zero features (columns) to remove: {list(zero_cols)}")
       X = X.drop(zero_cols, axis=1)
 
     # Remove duplicated features (columns)  
-    base_self.__print("Remove duplicated features (columns).")  
+    base_self.__print(f"Remove duplicated features (columns).")  
     dup_cols = X.columns[X.columns.duplicated()]
     if len(dup_cols) > 0:
       base_self.__print(f"Duplicated features (columns) to remove: {list(dup_cols)}")
       X = X.drop(dup_cols, axis=1)
 
     # Remove constant features (columns)
-    base_self.__print("Remove constant features (columns).")
+    base_self.__print(f"Remove constant features (columns).")
     constant_cols = [col for col in X.columns if X[col].nunique() == 1]
     if len(constant_cols) > 0:
       base_self.__print(f"Constant features (columns) to remove: {list(constant_cols)}")
@@ -312,12 +317,12 @@ class CICIoT2023():
     df = pd.concat([X, y], axis=1)
   
 
-    base_self.__print("Remove all null, nan, inf values (rows).")
+    base_self.__print(f"Remove all null, nan, inf values (rows).")
     df = df.replace([np.inf, -np.inf], np.NaN)
     df = df.dropna(axis='index', how='any')
     # Remove duplicated samples (rows)
-    base_self.__print("Remove duplicated samples (rows).")
-    df = df.drop_duplicates(df.drop_duplicates(subset=df.columns, keep='first'))
+    base_self.__print(f"Remove duplicated samples (rows).")
+    df = df.drop_duplicates(subset=X.columns, keep='first')
     base_self.__data_df = df
     base_self.__fts_names = base_self.__data_df.columns
 
@@ -337,7 +342,7 @@ class CICIoT2023():
     base_self.__print(f"Use {type_encoder} to encode features.")
     object_columns = df.select_dtypes(include=['object']).columns
     if len(object_columns) == 0:
-        base_self.__print("No object columns to encode.")
+        base_self.__print(f"No object columns to encode.")
     else:
         base_self.__print(f"List of encoded features: {list(object_columns)}")
         for col in object_columns:
@@ -376,7 +381,7 @@ class CICIoT2023():
   def __featuresSelection(base_self, type_select='SelectKBest', no_fts=None):
 
     if no_fts == 'all' or no_fts >= len(base_self.__fts_names):
-        base_self.__print("You select all features or larger. Ignoring...")
+        base_self.__print(f"You select all features or larger. Ignoring...")
         return
 
     if type_select =='SelectKBest':
@@ -480,9 +485,9 @@ class CICIoT2023():
       load_type = "preload" or "raw":
         Load data to dataframe. If using "raw" option, you should specific limit sample of each class by set number to "limit_cnt" because the dataset is very large. Default is "raw".
       limit_cnt = int:
-        Maximun sample in each class. Default is sys.maxsize.
+        Maximun sample in each class. Default is sys.maxsize. Only used when load_type="raw"
       frac = float between [0.,1.]:
-        Get data by ratio. Default is None.
+        Get data by ratio. Default is None. Only used when load_type="raw"
     Returns:
       None
     """
@@ -492,11 +497,10 @@ class CICIoT2023():
         datadir = base_self.__data_dir
         datapath = os.path.join(datadir, ("data_" + base_self.__ds_name + ".csv"))
       else:
-        datadir = path
         datapath = path
-      print("Data path:", datapath)
-      if os.path.exists(datapath) == True:
-        base_self.__data_df =  pd.read_csv(datapath, index_col=None, header=0)
+      print("Load Data at:", datapath)
+      if os.path.isfile(datapath) == True:
+        base_self.__data_df =  pd.read_csv(datapath, index_col=None, header=0, low_memory=False)
         base_self.__reDefineLabel()
         print("================================= Data loaded ====================================")
         return
@@ -575,8 +579,8 @@ class CICIoT2023():
       raise ValueError(f"Invalid data label!!! Select one of list labels: {base_self.__label_fts_names}")
     print("============================== Begin Split File ==================================")
     df = base_self.__data_df
-    print("============================== Dataframe be like =================================")
-    print('\n' + tabulate(base_self.__data_df.head(5), headers='keys', tablefmt='psql'))
+    base_self.__print("============================== Dataframe be like =================================")
+    base_self.__print(f"\n {tabulate(base_self.__data_df.head(5), headers='keys', tablefmt='psql')}")
 
     df_X = df.drop(columns = base_self.__label_fts_names, axis=1)
     df_y = df[target_variable]
@@ -595,8 +599,8 @@ class CICIoT2023():
     X_train, X_test, y_train, y_test = train_test_split(np.array(df_X), np.array(df_y),    
                                                         test_size=testsize, random_state=SEED)
 
-    print("Training data shape:",X_train.shape, y_train.shape)
-    print("Testing data shape:",X_test.shape, y_test.shape)
+    base_self.__print(f"Training data shape:{X_train.shape}, {y_train.shape}")
+    base_self.__print(f"Testing data shape:{X_test.shape}, {y_test.shape}")
 
     print("Label Train count:")
     unique= np.bincount(y_train)
@@ -656,6 +660,35 @@ class CICIoT2023():
       A pandas DataFrame
     """
     return base_self.__data_df
+
+  #=========================================================================================================================================
+  
+  def Split_data(base_self, target_variable=None):
+    """
+    Return the dataset as features and label.
+    Parameters:
+      target_variable = string:
+        Name of column contains the data label. Default is None.
+    Returns:
+      X = np.array:
+        Features.
+      y = np.array:
+        Label.
+    """
+    if target_variable is None or target_variable not in base_self.__label_fts_names:
+      raise ValueError(f"Invalid data label!!! Select one of list labels: {base_self.__label_fts_names}")
+    print("============================== Begin Split File ==================================")
+    df = base_self.__data_df
+    base_self.__print("============================== Dataframe be like =================================")
+    base_self.__print(f"\n {tabulate(base_self.__data_df.head(5), headers='keys', tablefmt='psql')}")
+
+    X = df.drop(columns = base_self.__label_fts_names, axis=1).to_numpy()
+    y = df[target_variable].to_numpy()
+      
+    base_self.__print(f"Features shape:{X.shape}")
+    base_self.__print(f"Label count: {np.unique(y)}")
+
+    return X, y
   
   #=========================================================================================================================================
 

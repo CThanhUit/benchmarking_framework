@@ -1,5 +1,5 @@
 # General parameters
-dataset: CICIDS2017
+dataset: ToNIoT
 model_name: RandomForest # LinearModel, KNN, SVM, DecisionTree, RandomForest, MLP
                            # XGBoost, CatBoost, LightGBM,
                            # TabNet, VIME, TabTransformer, ModelTree, NODE, DeepGBM, RLN, DNFNet,
@@ -34,8 +34,8 @@ epochs: 10
 logging_period: 100
 
 # About the data
-num_classes: 15  # for classification
-num_features: 78
+num_classes: 14  # will be automatically set.
+num_features: 80 # will be automatically set.
 cat_idx: []
 # cat_dims: will be automatically set.
 # cat_dims: [9, 16, 7, 15, 6, 5, 2, 42]

@@ -3,109 +3,76 @@ from tqdm.auto import tqdm
 import time 
 SEED = 42
 
-class CICDDoS2019():
+class ToNIoT():
   """
-  CICDDoS2019 dataset class.
+  ToNIoT dataset class.
   Parameters:
     seed = int:
       Seed for random function. Default is 42.
     print_able = bool:
       Allow to print description. Default is True.
   """
-  def __init__(base_self, seed = SEED, print_able = True) -> None:
+  def __init__(base_self, seed = SEED, print_able = True, save_csv = True) -> None:
     np.random.seed(seed)
     np.set_printoptions(suppress=True)
     base_self.__PRINT_ABLE = print_able
     base_self.__data_df = pd.DataFrame()
-    base_self.__target_variable = " Label"
-    base_self.__label_fts_names = [" Label"]
+    base_self.__target_variable = 'type'
+    base_self.__label_fts_names = ['label', 'type']
     base_self.__fts_names = [
-        'Unnamed: 0', 'Flow ID', ' Source IP', ' Source Port',
-       ' Destination IP', ' Destination Port', ' Protocol', ' Timestamp',
-       ' Flow Duration', ' Total Fwd Packets', ' Total Backward Packets',
-       'Total Length of Fwd Packets', ' Total Length of Bwd Packets',
-       ' Fwd Packet Length Max', ' Fwd Packet Length Min',
-       ' Fwd Packet Length Mean', ' Fwd Packet Length Std',
-       'Bwd Packet Length Max', ' Bwd Packet Length Min',
-       ' Bwd Packet Length Mean', ' Bwd Packet Length Std', 'Flow Bytes/s',
-       ' Flow Packets/s', ' Flow IAT Mean', ' Flow IAT Std', ' Flow IAT Max',
-       ' Flow IAT Min', 'Fwd IAT Total', ' Fwd IAT Mean', ' Fwd IAT Std',
-       ' Fwd IAT Max', ' Fwd IAT Min', 'Bwd IAT Total', ' Bwd IAT Mean',
-       ' Bwd IAT Std', ' Bwd IAT Max', ' Bwd IAT Min', 'Fwd PSH Flags',
-       ' Bwd PSH Flags', ' Fwd URG Flags', ' Bwd URG Flags',
-       ' Fwd Header Length', ' Bwd Header Length', 'Fwd Packets/s',
-       ' Bwd Packets/s', ' Min Packet Length', ' Max Packet Length',
-       ' Packet Length Mean', ' Packet Length Std', ' Packet Length Variance',
-       'FIN Flag Count', ' SYN Flag Count', ' RST Flag Count',
-       ' PSH Flag Count', ' ACK Flag Count', ' URG Flag Count',
-       ' CWE Flag Count', ' ECE Flag Count', ' Down/Up Ratio',
-       ' Average Packet Size', ' Avg Fwd Segment Size',
-       ' Avg Bwd Segment Size', ' Fwd Header Length.1', 'Fwd Avg Bytes/Bulk',
-       ' Fwd Avg Packets/Bulk', ' Fwd Avg Bulk Rate', ' Bwd Avg Bytes/Bulk',
-       ' Bwd Avg Packets/Bulk', 'Bwd Avg Bulk Rate', 'Subflow Fwd Packets',
-       ' Subflow Fwd Bytes', ' Subflow Bwd Packets', ' Subflow Bwd Bytes',
-       'Init_Win_bytes_forward', ' Init_Win_bytes_backward',
-       ' act_data_pkt_fwd', ' min_seg_size_forward', 'Active Mean',
-       ' Active Std', ' Active Max', ' Active Min', 'Idle Mean', ' Idle Std',
-       ' Idle Max', ' Idle Min', 'SimillarHTTP', ' Inbound', ' Label'
-    ]
-
-      
+      'ts', 'src_ip', 'src_port', 'dst_ip', 'dst_port', 'proto', 'service',
+      'duration', 'src_bytes', 'dst_bytes', 'conn_state', 'missed_bytes',
+      'src_pkts', 'src_ip_bytes', 'dst_pkts', 'dst_ip_bytes', 'dns_query',
+      'dns_qclass', 'dns_qtype', 'dns_rcode', 'dns_AA', 'dns_RD', 'dns_RA',
+      'dns_rejected', 'ssl_version', 'ssl_cipher', 'ssl_resumed',
+      'ssl_established', 'ssl_subject', 'ssl_issuer', 'http_trans_depth',
+      'http_method', 'http_uri', 'http_referrer', 'http_version',
+      'http_request_body_len', 'http_response_body_len', 'http_status_code',
+      'http_user_agent', 'http_orig_mime_types', 'http_resp_mime_types',
+      'weird_name', 'weird_addl', 'weird_notice', 'label', 'type'
+      ]
     base_self.__real_cnt = {
-      'TFTP': 20082580, 'BENIGN': 113828, 'DrDoS_LDAP': 2179930, 'DrDoS_MSSQL': 4522492,
-      'DrDoS_NetBIOS': 4093279, 'DrDoS_SNMP': 5159870, 'DrDoS_SSDP': 2610611, 'DrDoS_UDP': 3134645,
-      'UDP-lag': 366461, 'WebDDoS': 439, 'Syn': 6473789, 'DrDoS_DNS': 5071011, 'DrDoS_NTP': 1202642,
-      'Portmap': 186960, 'NetBIOS': 3657497, 'LDAP': 1915122, 'MSSQL': 5787453, 'UDP': 3867155, 'UDPLag': 1873
+      'normal':     796380,
+      'backdoor':   508116,
+      'ddos':       6165008,
+      'dos':        3375328,
+      'injection':  452659, 
+      'mitm':       1052,
+      'password':   1718568,
+      'ransomware': 72805, 
+      'scanning':   7140161, 
+      'xss':        2108944
     }  # Actual number of samples in the csv file of each class
-    base_self.__label_map = {
-        'DrDoS_LDAP'   :'LDAP',
-        'DrDoS_NetBIOS':'NetBIOS',
-        'DrDoS_MSSQL'  :'MSSQL',
-        'DrDoS_SSDP'   :'SSDP',
-        'DrDoS_UDP'    :'UDP',
-        'DrDoS_DNS'    :'DNS',
-        'DrDoS_SNMP'   :'SNMP',
-        'DrDoS_NTP'    :'NTP',
-        'UDP-lag'      :'UDPLag'
-    } # Map the actual label in the csv file with the label in the paper
+    base_self.__label_map = {} # Map the actual label in the csv file with the label in the paper
 
     base_self.__category_map = {
-        'BENIGN':   'Benign',
-        'Syn':      'DoS',
-        'UDP':      'DoS',
-        'UDPLag':   'DoS',
-        'MSSQL':    'DoS',
-        'SSDP':     'DoS',
-        'DNS':      'DoS',
-        'LDAP':     'DoS',
-        'NetBIOS':  'DoS',
-        'Portmap':  'DoS',
-        'SNMP':     'DoS',
-        'NTP':      'DoS',
-        'TFTP':     'DoS',
-        'WebDDoS':  'DoS'
+      'normal':    'normal',
+      'backdoor':  'backdoor',
+      'ddos':      'ddos',
+      'dos':       'dos',
+      'injection': 'injection',
+      'mitm':      'mitm',
+      'password':  'password',
+      'ransomware':'ransomware',
+      'scanning':  'scanning',
+      'xss':       'xss'
     } # Group the actual label in the csv file with the coresponding category in the paper
 
     base_self.__binary_map = {
-        'BENIGN':   'Benign',
-        'UDP':      'Malicious',
-        'Syn':      'Malicious',
-        'UDPLag':   'Malicious',
-        'MSSQL':    'Malicious',
-        'SSDP':     'Malicious',
-        'DNS':      'Malicious',
-        'LDAP':     'Malicious',
-        'NetBIOS':  'Malicious',
-        'Portmap':  'Malicious',
-        'SNMP':     'Malicious',
-        'NTP':      'Malicious',
-        'TFTP':     'Malicious',
-        'WebDDoS':  'Malicious'
+      'normal':    'Benign',
+      'backdoor':  'Malicious',
+      'ddos':      'Malicious',
+      'dos':       'Malicious',
+      'injection': 'Malicious',
+      'mitm':      'Malicious',
+      'password':  'Malicious',
+      'ransomware':'Malicious',
+      'scanning':  'Malicious',
+      'xss':       'Malicious',
     }
     base_self.__label_true_name = [
-        'BENIGN','Syn','UDP','UDPLag','MSSQL','SSDP','DNS',
-        'LDAP','NetBIOS','Portmap','SNMP','NTP','TFTP','WebDDoS'
-    ] # Map the actual label in the csv file with the label in the paper
+        'normal', 'backdoor', 'ddos', 'dos', 'injection', 'mitm','password','ransomware', 'scanning', 'xss'
+      ] # Map the actual label in the csv file with the label in the paper
 
     base_self.__label_drop = [] # List the label be dropped
     base_self.__label_cnt = {} # Actual number of samples loaded by function
@@ -115,13 +82,14 @@ class CICDDoS2019():
     base_self.__fixLabel()
 
   def __set_metadata(base_self) -> None:
-    base_self.__ds_name = "CICDDoS2019"
+    base_self.__ds_name = "ToNIoT"
     base_self.__ds_size = None
     base_self.__ds_fts = base_self.__fts_names
     base_self.__ds_label = base_self.__label_true_name
-    base_self.__ds_paper_link = "https://www.unb.ca/cic/datasets/ddos-2019.html"
-    base_self.__ds_link = "https://drive.usercontent.google.com/download?id=1xNuqrLpbzhKJJPg35a1ARyev8f-Y19Kl&export=download&authuser=2&confirm=t&uuid=3746ad5d-d105-41a4-bd52-0af8dcce3c65&at=APZUnTVE1zl0LlGgQv2yvTY1YGex:1720252187092"
+    base_self.__ds_paper_link = "https://research.unsw.edu.au/projects/toniot-datasets"
+    base_self.__ds_link = "https://drive.usercontent.google.com/download?id=10Nk4Tpo2wcct1596DXE15J6v87Cg4_xz&export=download&authuser=1&confirm=t&uuid=657cc769-d1d3-4988-b2be-3c4fd51000e4&at=APZUnTXCdY2zd-1YQN6VRgN7sOsB:1720492184445"
     base_self.__csv_link = None
+    # base_self._ds_name = ""
 
 
   def __print(base_self, str) -> None:
